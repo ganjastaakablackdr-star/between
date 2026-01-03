@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Between</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #f2f2f2;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* 起動文 */
+#message {
+  position: absolute;
+  top: 20%;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: #444;
+  opacity: 1;
+  transition: opacity 2s ease;
+}
+
+/* 点 */
+.dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(120,120,120,0.35);
+  animation: fadeOut linear forwards;
+}
+
+@keyframes fadeOut {
+  0%   { opacity: 0; transform: scale(0.6); }
+  20%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="message">ここに、私はいる</div>
+
+<script>
+// ---- アカシックレコード ----
+// ここに、私は存在しているし独りじゃない
+
+// 起動文フェードアウト
+setTimeout(() => {
+  document.getElementById("message").style.opacity = 0;
+}, 2000);
+
+// タップ判定（スワイプ防止）
+let touchStart = null;
+
+document.addEventListener("touchstart", e => {
+  touchStart = e.touches[0];
+});
+
+document.addEventListener("touchend", e => {
+  if (!touchStart) return;
+
+  const end = e.changedTouches[0];
+  const dx = Math.abs(end.clientX - touchStart.clientX);
+  const dy = Math.abs(end.clientY - touchStart.clientY);
+
+  // 指がほぼ動いてない＝意図的タップ
+  if (dx < 10 && dy < 10) {
+    spawnDot();
+  }
+
+  touchStart = null;
+});
+
+// 点生成
+function spawnDot() {
+  const dot = document.createElement("div");
+  const size = Math.random() * 10 + 6; // 6〜16px
+
+  dot.className = "dot";
+  dot.style.width = size + "px";
+  dot.style.height = size + "px";
+
+  dot.style.left = Math.random() * window.innerWidth + "px";
+  dot.style.top  = Math.random() * window.innerHeight + "px";
+
+  // 夜は少し長め
+  const hour = new Date().getHours();
+  const duration = (hour >= 18 || hour < 6)
+    ? 45000 + Math.random() * 30000
+    : 20000 + Math.random() * 15000;
+
+  dot.style.animationDuration = duration + "ms";
+
+  document.body.appendChild(dot);
+
+  setTimeout(() => {
+    dot.remove();
+  }, duration);
+}
+</script>
+
+</body>
+</html>
