@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Between</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #ededed;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* 起動文 */
+#startup-message {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.55em;
+  letter-spacing: 0.06em;
+  color: #555;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+#startup-message.show {
+  opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div id="startup-message">ここに、私はいる</div>
+
+<script>
+// 初回起動文
+(() => {
+  const KEY = "between_first_launch";
+  const message = document.getElementById("startup-message");
+  if (!localStorage.getItem(KEY)) {
+    localStorage.setItem(KEY, "true");
+    requestAnimationFrame(() => message.classList.add("show"));
+    setTimeout(() => message.classList.remove("show"), 3500);
+  }
+})();
+
+// 点の生成（タップのみ）
+let lastTouch = 0;
+
+document.addEventListener("touchstart", () => {
+  const now = Date.now();
+  if (now - lastTouch < 800) return;
+  lastTouch = now;
+
+  const dot = document.createElement("div");
+
+  const size = Math.random() * 13 + 12; // 12〜25px
+  const margin = 20;
+  const x = Math.random() * (window.innerWidth - margin*2) + margin;
+  const y = Math.random() * (window.innerHeight - margin*2) + margin;
+
+  const isNight = (() => {
+    const h = new Date().getHours();
+    return h < 6 || h >= 18;
+  })();
+
+  const lifetime = isNight
+    ? Math.random() * 30000 + 45000   // 夜 45〜75秒
+    : Math.random() * 20000 + 20000;  // 昼 20〜40秒
+
+  dot.style.width = size + "px";
+  dot.style.height = size + "px";
+  dot.style.background = "rgba(170,170,170,0.9)";
+  dot.style.borderRadius = "50%";
+  dot.style.position = "absolute";
+  dot.style.left = x + "px";
+  dot.style.top = y + "px";
+  dot.style.opacity = "0";
+  dot.style.transform = "scale(0.85)";
+  dot.style.filter = "blur(0.6px)";
+  dot.style.transition =
+    "opacity 1.4s ease, transform 6s ease, filter 6s ease";
+
+  document.body.appendChild(dot);
+
+  requestAnimationFrame(() => {
+    dot.style.opacity = "0.8";
+    dot.style.transform = "scale(1.05)";
+    dot.style.filter = "blur(1.3px)";
+  });
+
+  setTimeout(() => {
+    dot.style.opacity = "0";
+    dot.style.transform = "scale(1.15)";
+    setTimeout(() => dot.remove(), 1700);
+  }, lifetime);
+});
+</script>
+
+</body>
+</html>
