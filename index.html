@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Between</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #f2f2f2; /* ほんのり淡灰 */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* 起動文 */
+#startup-message {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.45em;
+  letter-spacing: 0.06em;
+  color: #555;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 1.2s ease;
+}
+
+#startup-message.show {
+  opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div id="startup-message">ここに、私はいる</div>
+
+<script>
+/* -------------------------
+   初回起動メッセージ
+------------------------- */
+(() => {
+  const KEY = "between_first_launch";
+  const message = document.getElementById("startup-message");
+  const isFirstLaunch = !localStorage.getItem(KEY);
+
+  if (isFirstLaunch) {
+    localStorage.setItem(KEY, "true");
+
+    requestAnimationFrame(() => {
+      message.classList.add("show");
+    });
+
+    // 表示保持
+    setTimeout(() => {
+      message.classList.remove("show");
+    }, 3500); // フェードイン含めて余韻あり
+  }
+})();
+
+/* -------------------------
+   点の生成
+------------------------- */
+document.addEventListener("touchstart", () => {
+  const dot = document.createElement("div");
+
+  // サイズ：最小引き上げ
+  const size = Math.random() * 13 + 12; // 12〜25px
+
+  // 端に行きすぎない余白
+  const margin = 20;
+  const x = Math.random() * (window.innerWidth - margin * 2) + margin;
+  const y = Math.random() * (window.innerHeight - margin * 2) + margin;
+
+  dot.style.width = size + "px";
+  dot.style.height = size + "px";
+  dot.style.background = "#aaa";
+  dot.style.borderRadius = "50%";
+  dot.style.position = "absolute";
+  dot.style.left = x + "px";
+  dot.style.top = y + "px";
+  dot.style.opacity = "0";
+
+  document.body.appendChild(dot);
+
+  /* フェードイン：気づいたら居た */
+  requestAnimationFrame(() => {
+    dot.style.transition = "opacity 1.3s ease";
+    dot.style.opacity = "0.65";
+  });
+
+  /* 存在時間（今は固定30秒） */
+  setTimeout(() => {
+    /* 余韻フェーズ */
+    dot.style.transition = "opacity 1.0s ease";
+    dot.style.opacity = "0.35";
+  }, 30000);
+
+  setTimeout(() => {
+    /* 離脱 */
+    dot.style.transition = "opacity 1.2s ease";
+    dot.style.opacity = "0";
+    setTimeout(() => dot.remove(), 1300);
+  }, 31000);
+});
+</script>
+
+</body>
+</html>
